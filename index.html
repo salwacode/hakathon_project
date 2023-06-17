@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+
+        #chat-container {
+            width: 70%;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .teacher-message {
+            background-color: #d9eef3;
+            color: #333;
+        }
+
+        .student-message {
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        #user-input-form {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            margin-right: 10px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chatbot</h1>
+    <div id="chat-container">
+        <div id="chat-log"></div>
+        <form id="user-input-form" action="/" method="POST">
+            <input type="text" id="user-input" name="user_input" autocomplete="off" autofocus />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+    const chatLog = document.getElementById('chat-log');
+    const chatDisplay = document.getElementById('chat-display');
+    const userInputForm = document.getElementById('user-input-form');
+    const userInput = document.getElementById('user-input');
+
+    userInputForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const userMessage = userInput.value.trim();
+        if (userMessage === '') {
+            return;
+        }
+
+        appendMessage('You', userMessage);
+
+        fetch('/', {
+            method: 'POST',
+            body: new URLSearchParams({
+                'user_input': userMessage
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const teacherOutput = data.teacher_output;
+            const studentOutput = data.student_output;
+
+            appendMessage('Teacher Bot', teacherOutput);
+            appendMessage('Student Bot', studentOutput);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+        userInput.value = '';
+    });
+
+    function appendMessage(sender, message) {
+        const messageElement = document.createElement('div');
+        messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        chatLog.appendChild(messageElement);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        //if (chatDisplay) {
+          //  chatDisplay.innerHTML += `<strong>${sender}:</strong> ${message}<br/>`;
+        //}
+    }
+    </script>
+</body>
+</html>
